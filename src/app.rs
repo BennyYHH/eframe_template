@@ -1,4 +1,4 @@
-use crate::scenes::scene::Scene;
+use super::engine::scene_manager::SceneManager;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -13,17 +13,17 @@ pub struct App {
     value: f32,
 
     #[serde(skip)]
-    scene: Scene,
+    scene_manger: SceneManager
 }
 
-impl Default for App {
+impl Default for App{
     fn default() -> Self {
         Self {
             // Example stuff:
             label: "Hello World!".to_owned(),
             value: 2.7,
 
-            scene: Scene::default(),
+            scene_manger: SceneManager::default(),
         }
     }
 }
@@ -44,7 +44,7 @@ impl App {
     }
 }
 
-impl eframe::App for App {
+impl eframe::App for App{
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
@@ -54,30 +54,30 @@ impl eframe::App for App {
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // let Self { label, value, scene } = self;
-        
+
         // Examples of how to create different panels and windows.
         // Pick whichever suits you.
         // Tip: a good default choice is to just keep the `CentralPanel`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
-        #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
-            egui::menu::bar(ui, |ui| {
-                ui.menu_button("File", |ui| {
-                    if ui.button("Quit").clicked() {
-                        _frame.close();
-                    }
-                });
-                ui.menu_button("Option", |ui| {
-                    if ui.button("pause").clicked() {
-                        println!("pause");
-                    }
-                })
-            });
-        });
-        
-        self.scene.render(ctx, _frame);
+        // #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
+        // egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+        //     // The top panel is often a good place for a menu bar:
+        //     egui::menu::bar(ui, |ui| {
+        //         ui.menu_button("File", |ui| {
+        //             if ui.button("Quit").clicked() {
+        //                 _frame.close();
+        //             }
+        //         });
+        //         ui.menu_button("Option", |ui| {
+        //             if ui.button("pause").clicked() {
+        //                 println!("pause");
+        //             }
+        //         })
+        //     });
+        // });
+
+        self.scene_manger.render(ctx, _frame);
         // egui::SidePanel::left("side_panel").show(ctx, |ui| {
         //     ui.heading("Side Panel");
 

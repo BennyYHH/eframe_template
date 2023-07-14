@@ -1,49 +1,89 @@
 use super::component::Component;
+use super::window_component::WindowComponent;
+use egui::{ScrollArea, SelectableLabel};
+use std::collections::BTreeSet;
 
 pub struct LeftBarMenu {
-  value: f32,
-  label: String
+    value: f32,
+    label: String,
+    open_state: BTreeSet<String>,
+
+    sub_window: Vec<Box<dyn WindowComponent>>,
 }
 
 impl Default for LeftBarMenu {
-  fn default() -> Self {
-    Self {
-      value: 3.0,
-      label: "Hello World!".to_owned(),
+    fn default() -> Self {
+        Self {
+            value: 3.0,
+            label: "Hello World!".to_owned(),
+            open_state: BTreeSet::new(),
+
+            sub_window: Vec::new(),
+        }
     }
-  }
 }
 
 impl Component for LeftBarMenu {
-  fn render(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-    let Self { label, value } = self;
+    fn render(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // let Self {
+        //     label,
+        //     value,
+        //     open_state,
+        // } = self;
 
-    egui::SidePanel::left("side_panel").show(ctx, |ui| {
-        ui.heading("Side Panel");
+        egui::SidePanel::left("side_panel")
+            .resizable(false)
+            .default_width(150.0)
+            .show(ctx, |ui| {
+                ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                    ui.heading("Menu Panel");
+                });
 
-        ui.horizontal(|ui| {
-            ui.label("Write something: ");
-            ui.text_edit_singleline(label);
-        });
+                ScrollArea::vertical().show(ui, |ui| {
+                    ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
+                        ui.separator();
 
-        ui.add(egui::Slider::new(value, 0.0..=10.0).text("value"));
-        if ui.button("Increment").clicked() {
-            *value += 1.0;
-        }
+                        append_toggle_button(
+                            ui,
+                            &mut self.open_state,
+                            "Button1",
+                            "Button1",
+                        );
 
-        ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-            ui.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 0.0;
-                ui.label("powered by ");
-                ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                ui.label(" and ");
-                ui.hyperlink_to(
-                    "eframe",
-                    "https://github.com/emilk/egui/tree/master/crates/eframe",
-                );
-                ui.label(".");
+                        append_toggle_button(
+                            ui,
+                            &mut self.open_state,
+                            "Button2",
+                            "Button2",
+                        );
+                    });
+                });
             });
-        });
-    });
-  }
+    }
+}
+
+fn append_toggle_button(
+    ui: &mut egui::Ui,
+    open_state: &mut BTreeSet<String>,
+    text: &str,
+    key: & str,
+) {
+    let mut is_open = open_state.contains(key);
+    if ui
+        .add_sized([150.0, 40.0], SelectableLabel::new(is_open, text))
+        .clicked()
+    {
+        is_open = !is_open;
+        set_open(open_state, &key, is_open);
+    };
+}
+
+fn set_open(open_state: &mut BTreeSet<String>, key: &str, is_open: bool) {
+    if is_open {
+        if !open_state.contains(key) {
+            open_state.insert(key.to_owned());
+        }
+    } else {
+        open_state.remove(key);
+    }
 }
