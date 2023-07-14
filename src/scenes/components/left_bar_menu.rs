@@ -1,6 +1,5 @@
-use super::component::Component;
-use super::window_component::WindowComponent;
-use egui::{ScrollArea, SelectableLabel};
+use super::{component::Component, window_component::WindowComponent};
+use egui::{ScrollArea, SelectableLabel, RichText};
 use std::collections::BTreeSet;
 
 pub struct LeftBarMenu {
@@ -8,7 +7,7 @@ pub struct LeftBarMenu {
     label: String,
     open_state: BTreeSet<String>,
 
-    sub_window: Vec<Box<dyn WindowComponent>>,
+    sub_windows: Vec<Box<dyn WindowComponent>>,
 }
 
 impl Default for LeftBarMenu {
@@ -18,47 +17,53 @@ impl Default for LeftBarMenu {
             label: "Hello World!".to_owned(),
             open_state: BTreeSet::new(),
 
-            sub_window: Vec::new(),
+            sub_windows: vec![
+                Box::new(super::item_window::ItemWindow::default()),
+                Box::new(super::global_map_window::GlobalMapWindow::default())
+            ],
         }
     }
 }
 
 impl Component for LeftBarMenu {
     fn render(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // let Self {
-        //     label,
-        //     value,
-        //     open_state,
-        // } = self;
-
         egui::SidePanel::left("side_panel")
             .resizable(false)
-            .default_width(150.0)
+            .exact_width(100.0)
             .show(ctx, |ui| {
                 ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
-                    ui.heading("Menu Panel");
+                    ui.heading("Main Menu");
                 });
 
                 ScrollArea::vertical().show(ui, |ui| {
                     ui.with_layout(egui::Layout::top_down_justified(egui::Align::LEFT), |ui| {
                         ui.separator();
 
-                        append_toggle_button(
-                            ui,
-                            &mut self.open_state,
-                            "Button1",
-                            "Button1",
-                        );
-
-                        append_toggle_button(
-                            ui,
-                            &mut self.open_state,
-                            "Button2",
-                            "Button2",
-                        );
+                        for window in self.sub_windows.iter_mut() {
+                            let key = window.get_id();
+                            let text = window.get_button_name();
+                            append_toggle_button(ui, &mut self.open_state, &text, &key);
+                        }
                     });
                 });
+
+                self.show_windows(ctx, _frame);
             });
+    }
+}
+
+impl LeftBarMenu {
+    pub fn show_windows(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let Self {
+            sub_windows,
+            value,
+            label,
+            open_state,
+        } = self;
+        for sub_window in sub_windows {
+            let mut is_open = open_state.contains(sub_window.get_id());
+            WindowComponent::render(sub_window.as_mut(), ctx, _frame, &mut is_open);
+        }
     }
 }
 
@@ -66,11 +71,17 @@ fn append_toggle_button(
     ui: &mut egui::Ui,
     open_state: &mut BTreeSet<String>,
     text: &str,
-    key: & str,
+    key: &str,
 ) {
     let mut is_open = open_state.contains(key);
     if ui
-        .add_sized([150.0, 40.0], SelectableLabel::new(is_open, text))
+        .add_sized(
+            [100.0, 40.0], 
+            SelectableLabel::new(
+                is_open, 
+                RichText::new(text).size(16.0)
+            )
+        )
         .clicked()
     {
         is_open = !is_open;
