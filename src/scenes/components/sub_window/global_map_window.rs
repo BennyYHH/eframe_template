@@ -61,5 +61,5 @@ impl WindowComponent for GlobalMapWindow {
 }
 
 impl Component for GlobalMapWindow {
-    fn render(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {}
+    fn render(&mut self, _ctx: &egui::Context, _frame: &mut eframe::Frame) {}
 }

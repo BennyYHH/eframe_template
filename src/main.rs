@@ -8,7 +8,12 @@ mod engine;
 // When compiling natively:
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result<()> {
+    use log::info;
+
+    std::env::set_var("RUST_LOG", "info");
+
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`)
+    info!("Initializing app...");
     let native_options = eframe::NativeOptions {
         min_window_size: Some(egui::Vec2 { x: 1024.0, y: 768.0 }),
         initial_window_size: Some(egui::Vec2 { x: 1024.0, y: 768.0 }),

@@ -26,11 +26,11 @@ impl Default for LeftBarMenu {
 }
 
 impl Component for LeftBarMenu {
-    fn render(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn render(&mut self, _ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::SidePanel::left("side_panel")
             .resizable(false)
-            .exact_width(100.0)
-            .show(ctx, |ui| {
+            .exact_width(110.0)
+            .show(_ctx, |ui| {
                 ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
                     ui.heading("Main Menu");
                 });
@@ -47,7 +47,7 @@ impl Component for LeftBarMenu {
                     });
                 });
 
-                self.show_windows(ctx, _frame);
+                self.show_windows(_ctx, _frame);
             });
     }
 }
@@ -56,13 +56,14 @@ impl LeftBarMenu {
     pub fn show_windows(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self {
             sub_windows,
-            value,
-            label,
+            value: _,
+            label: _,
             open_state,
         } = self;
         for sub_window in sub_windows {
             let mut is_open = open_state.contains(sub_window.get_id());
             WindowComponent::render(sub_window.as_mut(), ctx, _frame, &mut is_open);
+            set_open(open_state, sub_window.get_id(), is_open);
         }
     }
 }
@@ -76,7 +77,7 @@ fn append_toggle_button(
     let mut is_open = open_state.contains(key);
     if ui
         .add_sized(
-            [100.0, 40.0], 
+            [110.0, 40.0], 
             SelectableLabel::new(
                 is_open, 
                 RichText::new(text).size(16.0)
