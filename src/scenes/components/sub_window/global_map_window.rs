@@ -15,7 +15,7 @@ impl Default for GlobalMapWindow {
     fn default() -> Self {
         Self {
             id: "global_map_window".to_owned(),
-            button_name: "Global Map".to_owned(),
+            button_name: "Global".to_owned(),
             window_name: "Global Map".to_owned(),
 
             logarithmic: false,
