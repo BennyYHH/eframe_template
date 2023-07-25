@@ -3,7 +3,6 @@ use super::components::Component;
 use super::scene::Scene;
 
 pub struct MainScene {
-  name: String,
   id: u32,
   components: Vec<Box<dyn Component>>,
 }
@@ -11,7 +10,6 @@ pub struct MainScene {
 impl Default for MainScene {
   fn default() -> Self {
     Self {
-      name: "Hello World!".to_owned(),
       id: 1,
       components: vec![
         Box::new(LeftBarMenu::default()),
@@ -21,9 +19,6 @@ impl Default for MainScene {
 }
 
 impl Scene for MainScene {
-  fn get_name(&self) -> String {
-    self.name.clone()
-  }
   fn get_id(&self) -> u32 {
     self.id
   }
