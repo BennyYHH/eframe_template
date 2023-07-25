@@ -2,23 +2,25 @@ use super::components::LeftBarMenu;
 use super::components::Component;
 use super::scene::Scene;
 
-pub struct LandingScene {
+pub struct MainScene {
   name: String,
   id: u32,
   components: Vec<Box<dyn Component>>,
 }
 
-impl Default for LandingScene {
+impl Default for MainScene {
   fn default() -> Self {
     Self {
       name: "Hello World!".to_owned(),
-      id: 0,
-      components: vec![],
+      id: 1,
+      components: vec![
+        Box::new(LeftBarMenu::default()),
+      ],
     }
   }
 }
 
-impl Scene for LandingScene {
+impl Scene for MainScene {
   fn get_name(&self) -> String {
     self.name.clone()
   }

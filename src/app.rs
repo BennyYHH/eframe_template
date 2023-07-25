@@ -10,7 +10,6 @@ pub struct App {
     label: String,
 
     // this how you opt-out of serialization of a member
-    #[serde(skip)]
     value: f32,
 
     #[serde(skip)]

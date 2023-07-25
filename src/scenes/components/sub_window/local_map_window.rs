@@ -16,7 +16,7 @@ impl Default for LocalMapWindow {
         Self {
             id: "local_map_window".to_owned(),
             button_name: "Local".to_owned(),
-            window_name: "Global Map".to_owned(),
+            window_name: "Local Map".to_owned(),
 
             logarithmic: false,
             clamp_to_range: false,

@@ -21,7 +21,6 @@ impl Default for LeftBarMenu {
                 Box::new(super::party_window::PartyWindow::default()),
                 Box::new(super::save_load_window::SaveLoadWindow::default()),
                 Box::new(super::setting_window::SettingWindow::default()),
-
             ],
 
             map_windows: vec![
@@ -36,7 +35,7 @@ impl Component for LeftBarMenu {
     fn render(&mut self, _ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::SidePanel::left("side_panel")
             .resizable(false)
-            .exact_width(110.0)
+            .default_width(140.0)
             .show(_ctx, |ui| {
                 ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
                     ui.heading("Main Menu");
@@ -49,24 +48,30 @@ impl Component for LeftBarMenu {
                         for window in self.sub_windows.iter_mut() {
                             let key = window.get_id();
                             let text = window.get_button_name();
-                            append_toggle_button(ui, &mut self.open_state, &text, &key);
+                            append_toggle_button(ui, &mut self.open_state, &text, &key, [140.0, 40.0]);
                         }
                     });
                 });
 
-                ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
-                    for window in self.map_windows.iter_mut() {
-                        let key = window.get_id();
-                        let text = window.get_button_name();
-                        append_toggle_button(ui, &mut self.open_state, &text, &key);
-                    }
-                    ui.separator();
-                    ui.heading("Map");
-                });
-
-                self.show_windows(_ctx, _frame);
-                self.show_map_windows(_ctx, _frame);
+                egui::TopBottomPanel::bottom("map_panel")
+                    .resizable(false)
+                    .show_inside(ui, |ui| {
+                        ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                            ui.heading("Map");
+                        });
+                        ui.horizontal_wrapped(|ui| {
+                            for window in self.map_windows.iter_mut() {
+                                let key = window.get_id();
+                                let text = window.get_button_name();
+                                append_toggle_button(ui, &mut self.open_state, &text, &key, [45.0, 40.0]);
+                            }
+                        });
+                    });
             });
+        egui::CentralPanel::default().show(_ctx, |_: &mut egui::Ui| {
+            self.show_windows(_ctx, _frame);
+            self.show_map_windows(_ctx, _frame);
+        });
     }
 }
 
@@ -103,11 +108,12 @@ fn append_toggle_button(
     open_state: &mut BTreeSet<String>,
     text: &str,
     key: &str,
+    size: [f32; 2],
 ) {
     let mut is_open = open_state.contains(key);
     if ui
         .add_sized(
-            [110.0, 40.0],
+            size,
             SelectableLabel::new(is_open, RichText::new(text).size(16.0)),
         )
         .clicked()
